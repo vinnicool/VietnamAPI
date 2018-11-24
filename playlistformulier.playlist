@@ -1,0 +1,8 @@
+<Playlist Version="1.0"><Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormGet_Ok" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormPost_BadRequest" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormPost_Ok" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormGetWithId_NotFound" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormDeleteWithId_NotFound" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormGetWithId_Ok" />
+<Add Test="CloudApiVietnam.Tests.Controllers.FormulierenControllerTest.FormDeleteWithId_NoContent" />
+</Playlist>
