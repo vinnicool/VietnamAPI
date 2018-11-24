@@ -149,7 +149,7 @@ namespace CloudApiVietnam.Controllers
                 }
 
                 if (!result.Succeeded)
-                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, result.Errors.ToString());
+                    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, string.Join(" , ", result.Errors));
 
                 try
                 {

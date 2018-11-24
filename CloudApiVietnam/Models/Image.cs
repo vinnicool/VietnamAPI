@@ -11,8 +11,8 @@ namespace CloudApiVietnam.Models
     public class Image
     {
         [Key]
-        public string name { get; set; }
-        public Byte[] image { get; set; }
+        public string Name { get; set; }
+        public byte[] ImageData { get; set; }
         
     }
 

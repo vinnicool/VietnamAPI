@@ -44,7 +44,7 @@ namespace CloudApiVietnam.Tests.Controllers
             Assert.AreEqual(response.StatusCode, HttpStatusCode.Created);
             List<Image> images;
             Assert.IsTrue(response.TryGetContentValue<List<Image>>(out images));
-            this.guid = images[0].name;
+            this.guid = images[0].Name;
         }
         [TestMethod]
         public async Task PostMulitpleImage_Succes()
