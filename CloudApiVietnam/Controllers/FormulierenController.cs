@@ -50,16 +50,16 @@ namespace CloudApiVietnam.Controllers
         {
             try
             {
-                IsJSON isJson = IsValidJson(formulierenBindingModel.FormTemplate); // Check of JSON klopt en maak resultaat object
-                if (!isJson.Status) // als resultaat object status fals is return error
-                {
+                var isJson = IsValidJson(formulierenBindingModel.FormTemplate); // Check of JSON klopt en maak resultaat object
+                if (!isJson.Status) // als resultaat object status fals is return error                
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
-                }
-
-                Formulieren formulier = new Formulieren();
-                formulier.Name = formulierenBindingModel.Name;
-                formulier.Region = formulierenBindingModel.Region;
-                formulier.FormTemplate = formulierenBindingModel.FormTemplate;
+                
+                var formulier = new Formulieren
+                {
+                    Name = formulierenBindingModel.Name,
+                    Region = formulierenBindingModel.Region,
+                    FormTemplate = formulierenBindingModel.FormTemplate
+                };
 
                 db.Formulieren.Add(formulier);
                 db.SaveChanges();
@@ -101,7 +101,7 @@ namespace CloudApiVietnam.Controllers
                     return Request.CreateResponse(HttpStatusCode.OK, form);
                 }
 
-                List<JArray> formContentArray = new List<JArray>();
+                var formContentArray = new List<JArray>();
 
                 foreach (var formContent in formContentList)
                     formContentArray.Add(JArray.Parse(formContent.Content)); //parse db data to JSON list
@@ -113,15 +113,14 @@ namespace CloudApiVietnam.Controllers
 
                 UpdateFormContent(formContentArray, formTemplate);
 
-                foreach (var content in formContentList)
-                {
+                foreach (var content in formContentList)               
                     foreach (var newContent in formContentArray)
                     {
                         content.Content = newContent.ToString();
                         db.Entry(content).State = EntityState.Modified;
                         db.SaveChanges();
                     }
-                }
+                
 
                 return Request.CreateResponse(HttpStatusCode.OK, form);
             }
@@ -136,10 +135,8 @@ namespace CloudApiVietnam.Controllers
         {
             var formulier = db.Formulieren.Where(f => f.Id == id).FirstOrDefault();
 
-            if (formulier == null)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Form found with id: " + id.ToString());
-            }
+            if (formulier == null)            
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Form found with id: " + id.ToString());            
             else
             {
                 try
@@ -157,7 +154,7 @@ namespace CloudApiVietnam.Controllers
 
         private static IsJSON IsValidJson(string strInput)
         {
-            IsJSON result = new IsJSON();
+            var result = new IsJSON();
             strInput = strInput.Trim();
             if ((strInput.StartsWith("{") && strInput.EndsWith("}")) || //For object
                 (strInput.StartsWith("[") && strInput.EndsWith("]"))) //For array
@@ -197,14 +194,14 @@ namespace CloudApiVietnam.Controllers
             foreach (var formContent in formContentArray.ToList()) //loop through formContent related to form
             {
                 bool changed = false;
-                List<string> unchangedTokens = new List<string>();
+                var unchangedTokens = new List<string>();
                 foreach (JObject formContentToken in formContent.ToList()) //loop through the tokens of each formContent
                 {
-                    List<JProperty> formContentProperty = formContentToken.Properties().ToList(); //property is being used to get the key
+                    var formContentProperty = formContentToken.Properties().ToList(); //property is being used to get the key
 
                     foreach (JObject formTemplateToken in formTemplate.ToList()) //loop through the tokens of formTemplate
                     {
-                        List<JProperty> formTemplateProperty = formTemplateToken.Properties().ToList();
+                        var formTemplateProperty = formTemplateToken.Properties().ToList();
 
                         if (formContentProperty.First().Name != formTemplateProperty.First().Name && !changed && !unchangedTokens.Contains(formContentProperty.First().Name) && !unchangedTokens.Contains(formTemplateProperty.First().Name))
                         {

@@ -16,8 +16,7 @@ namespace CloudApiVietnam.Tests.Controllers
     /// </summary>
     [TestClass]
     public class FormulierenControllerTest
-    {
-        FormulierenController controller = new FormulierenController();
+    {       
         private int id;
         [TestMethod]
         [TestInitialize()]
@@ -29,9 +28,8 @@ namespace CloudApiVietnam.Tests.Controllers
             // Act
             HttpResponseMessage actionResult = controller.Get();
 
-            // Assert
-            List<Formulieren> formulier;
-            Assert.IsTrue(actionResult.TryGetContentValue<List<Formulieren>>(out formulier));
+            // Assert           
+            Assert.IsTrue(actionResult.TryGetContentValue(out List<Formulieren> formulier));
             this.id = formulier.FirstOrDefault().Id;
             Assert.AreEqual(actionResult.StatusCode, HttpStatusCode.OK);
         }
@@ -40,7 +38,7 @@ namespace CloudApiVietnam.Tests.Controllers
         {
             return new FormulierenController
             {
-                Request = new System.Net.Http.HttpRequestMessage(),
+                Request = new HttpRequestMessage(),
                 Configuration = new HttpConfiguration()
             };
         }
@@ -77,10 +75,12 @@ namespace CloudApiVietnam.Tests.Controllers
         {
             // Arramge
             FormulierenController controller = GetController();
-            FormulierenBindingModel formulierenBindingModel = new FormulierenBindingModel();
-            formulierenBindingModel.Name = "Testformulier9999";
-            formulierenBindingModel.Region = "Zuid-Holland";
-            formulierenBindingModel.FormTemplate = "[{'Naam':'string'},{'Leeftijd':'string'},{'Afwijking':'string'}]";
+            FormulierenBindingModel formulierenBindingModel = new FormulierenBindingModel
+            {
+                Name = "Testformulier9999",
+                Region = "Zuid-Holland",
+                FormTemplate = "[{'Naam':'string'},{'Leeftijd':'string'},{'Afwijking':'string'}]"
+            };
 
             // Act
             HttpResponseMessage actionResult = controller.Post(formulierenBindingModel);
@@ -96,10 +96,12 @@ namespace CloudApiVietnam.Tests.Controllers
             // Arramge
             FormulierenController controller = GetController();
 
-            FormulierenBindingModel formulierenBindingModel = new FormulierenBindingModel();
-            formulierenBindingModel.Name = "Testformulier9999";
-            formulierenBindingModel.Region = "Zuid-Holland";
-            formulierenBindingModel.FormTemplate = "{iets:data";
+            FormulierenBindingModel formulierenBindingModel = new FormulierenBindingModel
+            {
+                Name = "Testformulier9999",
+                Region = "Zuid-Holland",
+                FormTemplate = "{iets:data"
+            };
 
             // Act
             HttpResponseMessage actionResult = controller.Post(formulierenBindingModel);
