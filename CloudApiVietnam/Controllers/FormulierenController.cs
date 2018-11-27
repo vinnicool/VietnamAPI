@@ -17,6 +17,7 @@ namespace CloudApiVietnam.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET alle Formulieren
+        [AllowAnonymous]
         public HttpResponseMessage Get()
         {
             try
@@ -121,7 +122,6 @@ namespace CloudApiVietnam.Controllers
                         db.SaveChanges();
                     }
                 
-
                 return Request.CreateResponse(HttpStatusCode.OK, form);
             }
             catch (Exception ex)
