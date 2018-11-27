@@ -121,9 +121,9 @@ namespace CloudApiVietnam.Controllers
             }
         }
                
-        //POST /api/Account
-        //Voor nu even AllowAnonymous voor het eenvoudig testen[]
-        [Authorize(Roles ="Admin")]
+        //POST /api/Account        
+        //[Authorize(Roles ="Admin")]
+        [AllowAnonymous]
         public HttpResponseMessage Post(RegisterBindingModel model)
         {
             try
