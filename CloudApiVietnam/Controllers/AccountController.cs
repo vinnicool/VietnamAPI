@@ -234,6 +234,11 @@ namespace CloudApiVietnam.Controllers
 
         #region Helpers
 
+        public string GetRoleName(string roleId)
+        {
+            return db.Roles.Single(x => x.Id == roleId).Name;
+        }
+
         private IHttpActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)           
