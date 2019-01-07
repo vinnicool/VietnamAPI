@@ -11,7 +11,7 @@ using System.Web.Http;
 
 namespace CloudApiVietnam.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class FormulierenController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();

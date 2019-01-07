@@ -58,7 +58,7 @@ namespace CloudApiVietnam.Controllers
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
                 }
 
-                FormContent formContent = new FormContent
+                var formContent = new FormContent
                 {
                     Content = formContentBindingModel.Content,
                     FormulierenId = formContentBindingModel.FormId
