@@ -10,6 +10,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using CloudApiVietnam.Models;
+using CloudApiVietnam.Controllers;
 
 namespace CloudApiVietnam.Providers
 {
@@ -44,7 +45,7 @@ namespace CloudApiVietnam.Providers
             ClaimsIdentity cookiesIdentity = await user.GenerateUserIdentityAsync(userManager,
                 CookieAuthenticationDefaults.AuthenticationType);
 
-            AuthenticationProperties properties = CreateProperties(user.UserName);
+            AuthenticationProperties properties = CreateProperties(user.UserName, user.Roles);
             AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties);
             context.Validated(ticket);
             context.Request.Context.Authentication.SignIn(cookiesIdentity);
@@ -86,11 +87,13 @@ namespace CloudApiVietnam.Providers
             return Task.FromResult<object>(null);
         }
 
-        public static AuthenticationProperties CreateProperties(string userName)
+        public static AuthenticationProperties CreateProperties(string userName, ICollection<IdentityUserRole> roles)
         {
-            IDictionary<string, string> data = new Dictionary<string, string>
+            var roleName = new AccountController().GetRoleName(roles.First().RoleId);
+            var data = new Dictionary<string, string>
             {
-                { "userName", userName }
+                { "userName", userName },
+                { "role", roleName }
             };
             return new AuthenticationProperties(data);
         }
