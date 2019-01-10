@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace CloudApiVietnam.Controllers
@@ -14,6 +15,7 @@ namespace CloudApiVietnam.Controllers
     public class FormContentController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private ImagesController imagesController = new ImagesController();
 
         // GET alle FormContent
         public HttpResponseMessage Get()
@@ -21,9 +23,9 @@ namespace CloudApiVietnam.Controllers
             try
             {
                 var formContent = db.FormContent.ToList();
-                if (formContent == null)               
+                if (formContent == null)
                     return Request.CreateResponse(HttpStatusCode.NoContent, "No FormContent found");
-                
+
                 return Request.CreateResponse(HttpStatusCode.OK, formContent);
             }
             catch (Exception ex)
@@ -36,36 +38,48 @@ namespace CloudApiVietnam.Controllers
         public HttpResponseMessage Get(int id)
         {
             var formContent = db.FormContent.Where(f => f.Id == id).FirstOrDefault();
-            if (formContent == null)           
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No FormContent found with id: " + id.ToString());    
-            else           
+            if (formContent == null)
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No FormContent found with id: " + id.ToString());
+            else
                 return Request.CreateResponse(HttpStatusCode.OK, formContent);
-            
+
         }
 
         // POST een FormContent
-        public HttpResponseMessage Post(FormContentBindingModel formContentBindingModel)
+        public async Task<HttpResponseMessage> Post(FormContentBindingModel formContent)
         {
             try
             {
-                var isJson = IsValidJson(formContentBindingModel.Content); // Check of JSON klopt en maak resultaat object
+                var isJson = IsValidJson(formContent.Content); // Check of JSON klopt en maak resultaat object
                 if (!isJson.Status) // als resultaat object status fals is return error               
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
-                
-                var headersCheck = ContentEqualsHeaders(formContentBindingModel);
-                if (!headersCheck.Status)
-                {
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
-                }
 
-                var formContent = new FormContent
+                var headersCheck = ContentEqualsHeaders(formContent);
+                if (!headersCheck.Status)
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
+
+
+                var dbFormContent = new FormContent
                 {
-                    Content = formContentBindingModel.Content,
-                    FormulierenId = formContentBindingModel.FormId
+                    Content = formContent.Content,
+                    FormulierenId = formContent.FormId
                 };
 
+                var template = db.Formulieren.Single(x => x.Id == formContent.FormId);
+                var contentDictionary = GetContentDictionary(formContent.Content);
+                var addedContent = db.FormContent.Add(dbFormContent);
 
-                db.FormContent.Add(formContent);
+                var task = await imagesController.PostImage(new FormImageModel()
+                {
+                    FormId = addedContent.Id,
+                    BirthYear = contentDictionary.Single(x => x.Name.ToLower() == "birthyear").Value,
+                    Name = contentDictionary.Single(x => x.Name.ToLower() == "name").Value,
+                    TemplateName = template.Name,
+                });        
+            
+                if (!task.IsSuccessStatusCode)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "One or more images failed uploading: " + task.ReasonPhrase);
+
                 db.SaveChanges();
 
                 return Request.CreateResponse(HttpStatusCode.OK, formContent);
@@ -92,7 +106,7 @@ namespace CloudApiVietnam.Controllers
                 var isJson = IsValidJson(UpdateObject.Content); // Check of JSON klopt en maak resultaat object
                 if (!isJson.Status) // als resultaat object status fals is return error                
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
-                
+
 
                 var headersCheck = ContentEqualsHeaders(UpdateObject);
                 if (!headersCheck.Status)
@@ -137,10 +151,15 @@ namespace CloudApiVietnam.Controllers
             }
         }
 
+        private static List<FormContentKeyValuePair> GetContentDictionary(string content)
+        {
+            var dictionary = JsonConvert.DeserializeObject<List<FormContentKeyValuePair>>(content);
+            return dictionary;
+        }
 
         private static IsJSON IsValidJson(string strInput)
         {
-            IsJSON result = new IsJSON();
+            var result = new IsJSON();
             strInput = strInput.Trim();
             if ((strInput.StartsWith("{") && strInput.EndsWith("}")) || //For object
                 (strInput.StartsWith("[") && strInput.EndsWith("]"))) //For array

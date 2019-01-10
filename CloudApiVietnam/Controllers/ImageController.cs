@@ -100,6 +100,30 @@ namespace CloudApiVietnam.Controllers
             return result;
         }
 
+        //POST
+        public async Task<HttpResponseMessage> PostImage(FormImageModel model)
+        {           
+            if (ImageStoragetype == "AzureStorage")
+            {
+                try
+                {
+                    for (int i = 0; i < model.Image.Count; i++)
+                    {
+                        var imageName = String.Format($"{model.TemplateName}_{model.Name}_{model.BirthYear}_{i}");
+                        using (var imageStream = new MemoryStream(model.Image[i]))
+                        {
+                            await AzureStorageAsync(imageStream, imageName);
+                        }  
+                    }
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         // POST
         public async Task<HttpResponseMessage> Post()
         {

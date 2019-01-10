@@ -323,6 +323,8 @@
     <Compile Include="Models\ContentEqualsHeadersCheck.cs" />
     <Compile Include="Models\FormContent.cs" />
     <Compile Include="Models\FormContentBindingModel.cs" />
+    <Compile Include="Models\FormContentKeyValuePair.cs" />
+    <Compile Include="Models\FormImageModel.cs" />
     <Compile Include="Models\ImageBindingModel.cs" />
     <Compile Include="Models\Image.cs" />
     <Compile Include="Models\FormulierenBindingModel.cs" />
