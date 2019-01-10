@@ -8,9 +8,17 @@ namespace CloudApiVietnam.Models
 {
     public class FormContentBindingModel
     {
-        [Required(ErrorMessage = "FormId is verplicht")]      
-        public int FormId { get; set; }
-        public string Content { get; set; }
+        //[Required(ErrorMessage = "FormId is verplicht")]      
+        public int Id { get; set; }
+        public string FormContent { get; set; }
         public List<byte[]> Images { get; set; }
     }
+
+    public class FormContentModel
+    {   
+        public int Id { get; set; }
+        public List<FormContentKeyValuePair> FormContent { get; set; }
+        public List<byte[]> Images { get; set; }
+    }
+
 }

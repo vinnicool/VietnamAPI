@@ -11,7 +11,7 @@ using System.Web.Http;
 
 namespace CloudApiVietnam.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class FormContentController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -46,41 +46,45 @@ namespace CloudApiVietnam.Controllers
         }
 
         // POST een FormContent
-        public async Task<HttpResponseMessage> Post(FormContentBindingModel formContent)
+        public async Task<HttpResponseMessage> Post([FromBody] FormContentModel formContent)//FormContentBindingModel formContent)
         {
             try
             {
-                var isJson = IsValidJson(formContent.Content); // Check of JSON klopt en maak resultaat object
-                if (!isJson.Status) // als resultaat object status fals is return error               
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
+                //var isJson = IsValidJson(formContent.FormContent); // Check of JSON klopt en maak resultaat object
+                //    if (!isJson.Status) // als resultaat object status fals is return error               
+                //        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
 
-                var headersCheck = ContentEqualsHeaders(formContent);
-                if (!headersCheck.Status)
-                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
+                //    var headersCheck = ContentEqualsHeaders(formContent);
+                //    if (!headersCheck.Status)
+                //        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
 
+                if (formContent.FormContent.SingleOrDefault(x => x.Name.ToLower() == "name") == null
+                    || formContent.FormContent.SingleOrDefault(x => x.Name.ToLower() == "birthyear") == null
+                    || formContent.FormContent.SingleOrDefault(x => x.Name.ToLower() == "district") == null)
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Either the formcontent doesn't contain name, birthyear or district.");
 
-                var dbFormContent = new FormContent
-                {
-                    Content = formContent.Content,
-                    FormulierenId = formContent.FormId
-                };
+               var dbFormContent = new FormContent
+               {
+                  Content = JsonConvert.SerializeObject(formContent.FormContent, Formatting.None),
+                  FormulierenId = formContent.Id
+               };
 
-                var template = db.Formulieren.Single(x => x.Id == formContent.FormId);
-                var contentDictionary = GetContentDictionary(formContent.Content);
+                var template = db.Formulieren.Single(x => x.Id == formContent.Id);
+                 //var contentDictionary = GetContentDictionary(formContent.FormContent);
                 var addedContent = db.FormContent.Add(dbFormContent);
+                db.SaveChanges();
 
                 var task = await imagesController.PostImage(new FormImageModel()
                 {
                     FormId = addedContent.Id,
-                    BirthYear = contentDictionary.Single(x => x.Name.ToLower() == "birthyear").Value,
-                    Name = contentDictionary.Single(x => x.Name.ToLower() == "name").Value,
+                    BirthYear = formContent.FormContent.Single(x => x.Name.ToLower() == "birthyear").Value,
+                    Name = formContent.FormContent.Single(x => x.Name.ToLower() == "name").Value,
                     TemplateName = template.Name,
-                });        
+                    Images = formContent.Images
+                });
             
-                if (!task.IsSuccessStatusCode)
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "One or more images failed uploading: " + task.ReasonPhrase);
-
-                db.SaveChanges();
+                if ((int)task.Key != 200)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "One or more images failed uploading: " + task.Value);
 
                 return Request.CreateResponse(HttpStatusCode.OK, formContent);
             }
@@ -101,9 +105,9 @@ namespace CloudApiVietnam.Controllers
             }
             else
             {
-                formContent.FormulierenId = UpdateObject.FormId;
+                formContent.FormulierenId = UpdateObject.Id;
 
-                var isJson = IsValidJson(UpdateObject.Content); // Check of JSON klopt en maak resultaat object
+                var isJson = IsValidJson(UpdateObject.FormContent); // Check of JSON klopt en maak resultaat object
                 if (!isJson.Status) // als resultaat object status fals is return error                
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "JSON in 'content' is not correct JSON: " + isJson.Error);
 
@@ -114,7 +118,7 @@ namespace CloudApiVietnam.Controllers
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, headersCheck.Error);
                 }
 
-                formContent.Content = UpdateObject.Content;
+                formContent.Content = UpdateObject.FormContent;
                 try
                 {
                     db.SaveChanges();
@@ -195,9 +199,9 @@ namespace CloudApiVietnam.Controllers
         private ContentEqualsHeadersCheck ContentEqualsHeaders(FormContentBindingModel formContentBindingModel)
         {
             var result = new ContentEqualsHeadersCheck();
-            var Formulier = db.Formulieren.Where(f => f.Id == formContentBindingModel.FormId).FirstOrDefault(); //Haalt bijbehorende formulier op
+            var Formulier = db.Formulieren.Where(f => f.Id == formContentBindingModel.Id).FirstOrDefault(); //Haalt bijbehorende formulier op
 
-            var obj = JToken.Parse(formContentBindingModel.Content); //Maak object van mee gegeven content
+            var obj = JToken.Parse(formContentBindingModel.FormContent); //Maak object van mee gegeven content
 
             foreach (var item in obj) //loop door mee gegeven content
             {

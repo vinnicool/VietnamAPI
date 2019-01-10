@@ -101,16 +101,17 @@ namespace CloudApiVietnam.Controllers
         }
 
         //POST
-        public async Task<HttpResponseMessage> PostImage(FormImageModel model)
-        {           
+        public async Task<KeyValuePair<HttpStatusCode,string>> PostImage(FormImageModel model)
+        {
+            var request = HttpContext.Current.Request;
             if (ImageStoragetype == "AzureStorage")
             {
                 try
                 {
-                    for (int i = 0; i < model.Image.Count; i++)
+                    for (int i = 0; i < model.Images.Count; i++)
                     {
-                        var imageName = String.Format($"{model.TemplateName}_{model.Name}_{model.BirthYear}_{i}");
-                        using (var imageStream = new MemoryStream(model.Image[i]))
+                        var imageName = string.Format($"{model.TemplateName}_{model.Name}_{model.BirthYear}_{i}.jpeg");
+                        using (var imageStream = new MemoryStream(model.Images[i]))
                         {
                             await AzureStorageAsync(imageStream, imageName);
                         }  
@@ -118,10 +119,10 @@ namespace CloudApiVietnam.Controllers
                 }
                 catch (Exception e)
                 {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                    return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.BadRequest, e.Message); //Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
                 }
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.OK, "Success");
         }
 
         // POST

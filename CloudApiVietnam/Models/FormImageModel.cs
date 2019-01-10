@@ -9,6 +9,6 @@ namespace CloudApiVietnam.Models
         public string TemplateName { get; set; }
         public string BirthYear { get; set; }
         
-        public List<byte[]> Image { get; set; }
+        public List<byte[]> Images { get; set; }
     }
 }
