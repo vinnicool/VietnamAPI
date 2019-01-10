@@ -11,5 +11,6 @@ namespace CloudApiVietnam.Models
         [Required(ErrorMessage = "FormId is verplicht")]      
         public int FormId { get; set; }
         public string Content { get; set; }
+        public List<byte[]> Images { get; set; }
     }
 }
