@@ -86,11 +86,11 @@ namespace CloudApiVietnam.Controllers
                 if ((int)task.Key != 200)
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, "One or more images failed uploading: " + task.Value);
 
-                return Request.CreateResponse(HttpStatusCode.OK, formContent);
+                return Request.CreateResponse(HttpStatusCode.OK, new FormContentModel() { Id = formContent.Id, FormContent = formContent.FormContent, FormTemplateName = template.Name });
             }
             catch (Exception ex)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex.Message + " : " + ex.InnerException + " : " + ex.StackTrace);
             }
         }
 

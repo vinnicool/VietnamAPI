@@ -22,7 +22,7 @@ namespace CloudApiVietnam.Controllers
         {
             try
             {
-                var formulieren = db.Formulieren.Include("FormContent").ToList();
+                var formulieren = db.Formulieren.ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, formulieren);
             }
             catch (Exception ex)
@@ -34,7 +34,7 @@ namespace CloudApiVietnam.Controllers
         // GET specifiek Formulier
         public HttpResponseMessage Get(int id)
         {
-            var formulier = db.Formulieren.Include("FormContent").Where(f => f.Id == id).FirstOrDefault();
+            var formulier = db.Formulieren.Where(f => f.Id == id).FirstOrDefault();
             if (formulier == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Form found with id: " + id.ToString());

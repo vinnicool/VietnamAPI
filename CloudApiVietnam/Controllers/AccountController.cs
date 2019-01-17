@@ -213,7 +213,8 @@ namespace CloudApiVietnam.Controllers
                         //Vervang de usre role als deze anders is
                         if (user.Roles.FirstOrDefault().RoleId != role.Id)
                         {
-                            UserManager.RemoveFromRole(user.Id, role.Name);
+                            string[] userRoles = UserManager.GetRoles(user.Id).ToArray();
+                            UserManager.RemoveFromRoles(user.Id, userRoles);
                             UserManager.AddToRole(user.Id, model.UserRole);
                         }
 
@@ -223,7 +224,17 @@ namespace CloudApiVietnam.Controllers
 
                     //Sla de changes op
                     db.SaveChanges();
-                    return Request.CreateResponse(HttpStatusCode.OK, user);
+
+                    var dbUser = db.Users.Where(x => x.Id == user.Id).Select(u => new UserInfo
+                    {
+                        Email = u.Email,
+                        Roles = u.Roles,
+                        Id = u.Id,
+                        UserName = u.UserName
+                    }).FirstOrDefault();
+                    dbUser.Roles = db.Roles.Select(x => x.Users.FirstOrDefault(u => u.UserId == dbUser.Id)).Where(s => s != null).ToList();
+
+                    return Request.CreateResponse(HttpStatusCode.OK, dbUser);
                 }
                 catch (Exception ex)
                 {

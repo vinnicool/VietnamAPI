@@ -19,6 +19,8 @@ namespace CloudApiVietnam.Models
         public int Id { get; set; }
         public List<FormContentKeyValuePair> FormContent { get; set; }
         public List<byte[]> Images { get; set; }
+
+        public string FormTemplateName { get; set; }
     }
 
 }
