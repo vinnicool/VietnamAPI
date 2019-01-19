@@ -28,13 +28,13 @@ namespace CloudApiVietnam.Controllers
         // To be set AzureStorage if not, sql database will be used to store images (less than 32gb not advised)
         private string ImageStoragetype = System.Configuration.ConfigurationManager.AppSettings["ImageStoragetype"];
         // GET specific Image
-        public async Task<HttpResponseMessage> Get(string id)
+        public async Task<KeyValuePair<HttpStatusCode, HttpResponseMessage>> Get(string id)
         {
             var imageStream = new MemoryStream();
             HttpResponseMessage result;
 
             if (id == "")
-                return IdIsNullResponse(out result);
+                return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.NotFound, new HttpResponseMessage { Content = new StringContent("No parameter given.") }); //IdIsNullResponse(out result);
 
             if (ImageStoragetype == "AzureStorage")
             {
@@ -51,7 +51,7 @@ namespace CloudApiVietnam.Controllers
                         {
                             Content = new StringContent("Requested image could not be downloaded..")
                         };
-                        return result;
+                        return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.InternalServerError, result); // result;
                     }
                 }
                 catch (Exception e)
@@ -62,7 +62,7 @@ namespace CloudApiVietnam.Controllers
                         {
                             Content = new StringContent("Image not found")
                         };
-                        return result;
+                        return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.NotFound, result); //result;
                     }
                     else
                     {
@@ -70,7 +70,7 @@ namespace CloudApiVietnam.Controllers
                         {
                             Content = new StringContent(e.Message)
                         };
-                        return result;
+                        return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.InternalServerError, result); //result;
                     }
 
                 }
@@ -88,7 +88,7 @@ namespace CloudApiVietnam.Controllers
                     {
                         Content = new StringContent(e.Message)
                     };
-                    return result;
+                    return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.InternalServerError, result); //result;
                 }
             }
 
@@ -97,7 +97,7 @@ namespace CloudApiVietnam.Controllers
                 Content = new StreamContent(imageStream)
             };
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-            return result;
+            return new KeyValuePair<HttpStatusCode, HttpResponseMessage>(HttpStatusCode.OK, result); //result;
         }
 
         //POST

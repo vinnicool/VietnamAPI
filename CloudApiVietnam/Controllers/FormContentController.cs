@@ -22,11 +22,43 @@ namespace CloudApiVietnam.Controllers
         {
             try
             {
-                var formContent = db.FormContent.ToList();
+                var formContent = (from c in db.FormContent
+                                   join f in db.Formulieren on c.FormulierenId equals f.Id
+                                   select new FormTemplatePlusContent()
+                                   {
+                                       Id = f.Id,
+                                       FormContent = new FormContentApiModel() { Content = c.Content, FormTemplateId = f.Id, Id = c.Id },
+                                       FormTemplate = f.FormTemplate,
+                                       Name = f.Name,
+                                       Region = f.Region,                                      
+                                   }).ToList();
+
                 if (formContent == null)
                     return Request.CreateResponse(HttpStatusCode.NoContent, "No FormContent found");
+              
+                //foreach (var content in formContent) 
+                //{
+                //    content.Images = new List<byte[]>();
+                //    var kvps = JsonConvert.DeserializeObject<List<FormContentKeyValuePair>>(content.FormContent.Content);
+                //    var name = kvps.First(x => x.Name == "Name").Value;
+                //    var birthyear = kvps.First(x => x.Name == "Birthyear").Value;                   
+                //    var convertedImages = new List<byte[]>();
+                //    for (int i = 0; i < 500; i++) {
+                //        var imageName = string.Format($"{content.Name}_{name}_{birthyear}_{i}.jpeg");
+                //        var task = await imagesController.Get(imageName);
 
-                return Request.CreateResponse(HttpStatusCode.OK, formContent);
+                //        if ((int)task.Key == 200)
+                //        {
+                //            var stream = await task.Value.Content.ReadAsByteArrayAsync();
+                //            content.Images.Add(stream);
+                //        }
+                //        else
+                //            break;
+                //    }
+                    
+                //}
+                
+            return Request.CreateResponse(HttpStatusCode.OK, formContent);
             }
             catch (Exception ex)
             {
