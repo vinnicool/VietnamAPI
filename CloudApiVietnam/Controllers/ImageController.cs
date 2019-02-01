@@ -168,7 +168,7 @@ namespace CloudApiVietnam.Controllers
                     try
                     {
                         await AzureStorageAsync(imageStream, blobNameReference);
-                        Image image = new Image();
+                        var image = new Image();
                         image.Name = blobNameReference;
                         imageList.Add(image);
                     }

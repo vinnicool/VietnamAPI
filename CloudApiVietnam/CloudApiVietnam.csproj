@@ -317,6 +317,14 @@
     <Compile Include="Migrations\201811271051332_renameImages.Designer.cs">
       <DependentUpon>201811271051332_renameImages.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901231320361_RemovedFormContentFromTemplateModel.cs" />
+    <Compile Include="Migrations\201901231320361_RemovedFormContentFromTemplateModel.Designer.cs">
+      <DependentUpon>201901231320361_RemovedFormContentFromTemplateModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231347547_isdeletedreadded.cs" />
+    <Compile Include="Migrations\201901231347547_isdeletedreadded.Designer.cs">
+      <DependentUpon>201901231347547_isdeletedreadded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -327,6 +335,7 @@
     <Compile Include="Models\FormContentKeyValuePair.cs" />
     <Compile Include="Models\FormImageModel.cs" />
     <Compile Include="Models\FormTemplatePlusContent.cs" />
+    <Compile Include="Models\FormulierReturnModel.cs" />
     <Compile Include="Models\ImageBindingModel.cs" />
     <Compile Include="Models\Image.cs" />
     <Compile Include="Models\FormulierenBindingModel.cs" />
@@ -503,6 +512,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811271051332_renameImages.resx">
       <DependentUpon>201811271051332_renameImages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231320361_RemovedFormContentFromTemplateModel.resx">
+      <DependentUpon>201901231320361_RemovedFormContentFromTemplateModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231347547_isdeletedreadded.resx">
+      <DependentUpon>201901231347547_isdeletedreadded.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
